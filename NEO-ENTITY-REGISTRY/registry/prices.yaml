@@ -1,0 +1,26 @@
+version: 1.0.0
+currency: YNY
+offers:
+- {entity: neo.action.yny_chat, price: 3}
+- {entity: neo.skill.web_serf, via: neo.action.yny_chat, price: 1}
+- {entity: neo.skill.image, via: neo.action.yny_chat, price: 1}
+- {entity: neo.skill.video, via: neo.action.yny_chat, price: 1}
+- {entity: neo.skill.corrector, via: neo.action.yny_chat, price: 1}
+- {entity: neo.skill.geo, via: neo.action.yny_chat, price: 1}
+- {entity: neo.skill.connect, via: neo.action.yny_chat, price: 1}
+- {entity: neo.action.corp, price: 8}
+- {entity: neo.corp.infoteka, via: neo.action.corp, price: 3}
+- {entity: neo.corp.content_factoriya, via: neo.action.corp, price: 3}
+- {entity: neo.corp.smm_avtopylot, via: neo.action.corp, price: 3}
+- {entity: neo.corp.ofis, via: neo.action.corp, price: 3}
+- {entity: neo.profile.acaunt, price: 1}
+- {entity: neo.profile.avatar, price: 1}
+- {entity: neo.profile.modal, price: 1}
+- {entity: neo.list.window, price: 1, free_quantity: 3, max_quantity: 100}
+- {entity: neo.space.slay, price: 3}
+- {entity: neo.space.bord, price: 8}
+- {entity: neo.space.3d, price: 33}
+- {entity: neo.space.vr, price: 88}
+- {entity: neo.space.mv, price: 333}
+- {entity: neo.orb.personal, price: 3, repeatable: true}
+- {entity: neo.orb.corp, price: 8, repeatable: true}
