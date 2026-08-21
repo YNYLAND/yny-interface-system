@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "scope": "INTERFACE/ACTOR",
+  "generated_from": [
+    "registry/entities.yaml",
+    "registry/relations.yaml",
+    "registry/taxonomy.yaml",
+    "registry/prices.yaml",
+    "registry/views/wiki.yaml",
+    "registry/views/gid.yaml"
+  ],
+  "status": "bootstrap",
+  "note": "The executable build script will replace this bootstrap manifest with the full generated registry after validator/build is added."
+}
