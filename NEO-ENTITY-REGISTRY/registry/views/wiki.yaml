@@ -1,0 +1,6 @@
+source: NEO_ENTITY_REGISTRY
+scope: INTERFACE/ACTOR
+views: [STRUCTURE, TYPE, PURPOSE, PRICE, LEVEL]
+render:
+  entity: CARD
+  name_field: canonical_name
