@@ -1,0 +1,150 @@
+version: 1.0.0
+scope: INTERFACE/ACTOR
+relations:
+- {from: neo.world, to: neo.action, relation: CONTAINS}
+- {from: neo.world, to: neo.profile, relation: CONTAINS}
+- {from: neo.world, to: neo.balance, relation: CONTAINS}
+- {from: neo.world, to: neo.game, relation: CONTAINS}
+- {from: neo.world, to: neo.list, relation: CONTAINS}
+- {from: neo.world, to: neo.space, relation: CONTAINS}
+- {from: neo.world, to: neo.orb_dock, relation: CONTAINS}
+- {from: neo.balance, to: neo.currency.yny, relation: USES_RESOURCE}
+- {from: neo.action, to: neo.action.system, relation: ENVIRONMENT}
+- {from: neo.action.system, to: neo.system.orb, relation: SYSTEM_MODE}
+- {from: neo.action.system, to: neo.system.wiki, relation: SYSTEM_MODE}
+- {from: neo.action.system, to: neo.system.gid, relation: SYSTEM_MODE}
+- {from: neo.action.system, to: neo.system.integration, relation: SYSTEM_MODE}
+- from: neo.action
+  to: neo.action.yny_chat
+  relation: OFFER
+  price: {amount: 3, currency: YNY}
+- from: neo.action.yny_chat
+  to: neo.skill.web_serf
+  relation: OFFER
+  dependency: neo.action.yny_chat
+  price: {amount: 1, currency: YNY}
+- from: neo.action.yny_chat
+  to: neo.skill.image
+  relation: OFFER
+  dependency: neo.action.yny_chat
+  price: {amount: 1, currency: YNY}
+- from: neo.action.yny_chat
+  to: neo.skill.video
+  relation: OFFER
+  dependency: neo.action.yny_chat
+  price: {amount: 1, currency: YNY}
+- from: neo.action.yny_chat
+  to: neo.skill.corrector
+  relation: OFFER
+  dependency: neo.action.yny_chat
+  price: {amount: 1, currency: YNY}
+- from: neo.action.yny_chat
+  to: neo.skill.geo
+  relation: OFFER
+  dependency: neo.action.yny_chat
+  price: {amount: 1, currency: YNY}
+- from: neo.action.yny_chat
+  to: neo.skill.connect
+  relation: OFFER
+  dependency: neo.action.yny_chat
+  price: {amount: 1, currency: YNY}
+- from: neo.action
+  to: neo.action.corp
+  relation: OFFER
+  price: {amount: 8, currency: YNY}
+- from: neo.action.corp
+  to: neo.corp.infoteka
+  relation: OFFER
+  dependency: neo.action.corp
+  price: {amount: 3, currency: YNY}
+- from: neo.action.corp
+  to: neo.corp.content_factoriya
+  relation: OFFER
+  dependency: neo.action.corp
+  price: {amount: 3, currency: YNY}
+- from: neo.action.corp
+  to: neo.corp.smm_avtopylot
+  relation: OFFER
+  dependency: neo.action.corp
+  price: {amount: 3, currency: YNY}
+- from: neo.action.corp
+  to: neo.corp.ofis
+  relation: OFFER
+  dependency: neo.action.corp
+  price: {amount: 3, currency: YNY}
+- from: neo.profile
+  to: neo.profile.acaunt
+  relation: OFFER
+  price: {amount: 1, currency: YNY}
+- {from: neo.profile.acaunt, to: neo.acaunt.grup, relation: FORM}
+- {from: neo.profile.acaunt, to: neo.acaunt.page, relation: FORM}
+- {from: neo.profile.acaunt, to: neo.acaunt.assys, relation: FORM}
+- {from: neo.profile.acaunt, to: neo.acaunt.wallet, relation: FORM}
+- {from: neo.profile.acaunt, to: neo.acaunt.cabinet, relation: FORM}
+- {from: neo.acaunt.page, to: neo.page.domen, relation: HAS_CAPABILITY}
+- {from: neo.acaunt.page, to: neo.page.referral, relation: HAS_CAPABILITY}
+- from: neo.profile
+  to: neo.profile.avatar
+  relation: OFFER
+  price: {amount: 1, currency: YNY}
+- {from: neo.profile.avatar, to: neo.avatar.incognito, relation: FORM}
+- {from: neo.profile.avatar, to: neo.avatar.geometry_color, relation: FORM}
+- {from: neo.profile.avatar, to: neo.avatar.verified, relation: FORM}
+- {from: neo.profile.avatar, to: neo.avatar.photo, relation: FORM}
+- {from: neo.profile.avatar, to: neo.avatar.ai_persona, relation: FORM}
+- {from: neo.profile.avatar, to: neo.avatar.imeydg, relation: FORM}
+- {from: neo.profile.avatar, to: neo.skill.video, relation: FORM}
+- {from: neo.profile.avatar, to: neo.avatar.text, relation: FORM}
+- from: neo.profile
+  to: neo.profile.modal
+  relation: OFFER
+  price: {amount: 1, currency: YNY}
+- {from: neo.profile.modal, to: neo.modal.sayt, relation: FORM}
+- {from: neo.profile.modal, to: neo.modal.portal, relation: FORM}
+- {from: neo.profile.modal, to: neo.modal.lending, relation: FORM}
+- {from: neo.profile.modal, to: neo.modal.catalog, relation: FORM}
+- {from: neo.profile.modal, to: neo.modal.book, relation: FORM}
+- {from: neo.profile.modal, to: neo.modal.curs, relation: FORM}
+- {from: neo.profile.modal, to: neo.modal.map, relation: FORM}
+- {from: neo.profile.modal, to: neo.modal.vizion, relation: FORM}
+- {from: neo.game, to: neo.game.actor, relation: MODE}
+- {from: neo.game, to: neo.game.creator, relation: MODE}
+- {from: neo.game, to: neo.game.dev, relation: MODE}
+- {from: neo.game, to: neo.game.igrok, relation: MODE}
+- from: neo.list
+  to: neo.list.window
+  relation: SLOT_SERIES
+  free_quantity: 3
+  max_quantity: 100
+  unit_price: {amount: 1, currency: YNY}
+- from: neo.space
+  to: neo.space.slay
+  relation: OFFER
+  price: {amount: 3, currency: YNY}
+- from: neo.space
+  to: neo.space.bord
+  relation: OFFER
+  price: {amount: 8, currency: YNY}
+- from: neo.space
+  to: neo.space.3d
+  relation: OFFER
+  price: {amount: 33, currency: YNY}
+- from: neo.space
+  to: neo.space.vr
+  relation: OFFER
+  price: {amount: 88, currency: YNY}
+- from: neo.space
+  to: neo.space.mv
+  relation: OFFER
+  price: {amount: 333, currency: YNY}
+- {from: neo.orb_dock, to: neo.orb.system, relation: ORB_TYPE}
+- from: neo.orb_dock
+  to: neo.orb.personal
+  relation: OFFER
+  repeatable: true
+  price: {amount: 3, currency: YNY}
+- from: neo.orb_dock
+  to: neo.orb.corp
+  relation: OFFER
+  repeatable: true
+  price: {amount: 8, currency: YNY}
