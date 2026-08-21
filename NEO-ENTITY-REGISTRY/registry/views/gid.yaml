@@ -1,0 +1,6 @@
+source: NEO_ENTITY_REGISTRY
+scope: INTERFACE/ACTOR
+views: [STRUCTURE, ROUTE, MODE, SPACE, ACCESS]
+render:
+  entity: NODE
+  relation: EDGE
