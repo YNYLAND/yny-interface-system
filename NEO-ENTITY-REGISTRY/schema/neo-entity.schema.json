@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NEO Entity Registry Entity",
+  "type": "object",
+  "required": ["id", "canonical_name", "type", "purpose", "level", "modes", "translatable"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^neo\\.[a-z0-9_.]+$"},
+    "canonical_name": {"type": "string", "minLength": 1},
+    "type": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "purpose": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "level": {"type": "string"},
+    "modes": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "translatable": {"const": false},
+    "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  },
+  "additionalProperties": false
+}
