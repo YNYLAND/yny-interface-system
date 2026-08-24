@@ -4,9 +4,7 @@
 
 Dynamic Interface is the visual/action language of Orb.
 
-The flagship model should not know how Telegram, Web, Unity or VR draws a button. It should express semantic interface intent. The server validates that intent against current state, rights, prices and available actions. Each channel adapter renders the same canonical intent in its native form.
-
-Canonical pipeline:
+The flagship model should express semantic interface intent. The server validates intent against current state, rights, prices and available actions. Channel adapters render the same semantic action in Telegram, Web, Unity, 3D, VR or future interfaces.
 
 ```text
 FLAGSHIP ORB
@@ -19,23 +17,25 @@ FLAGSHIP ORB
 
 ## Current production reality
 
-Today the language is fragmented.
+Today a real proto-language already exists, but it is fragmented across four layers.
 
-### Model-visible UI in orb-api
+### 1. Flagship/model UI layer
 
-The model may currently emit hidden `[UI]...[/UI]` with a tiny `buttons` array.
+Current `orb-api` allows the flagship response to emit a hidden `[UI]...[/UI]` block.
 
-Model-generated actions currently accepted by `sanitizeOrbUi`:
+Model-originated actions accepted by current `sanitizeOrbUi` are:
 - `open_skill_catalog`
 - `open_skill` + `skill_key`
 - `enter_ynychat` when owned and not already active
 - `exit_ynychat` while YNY CHAT is active.
 
-The model cannot directly create `purchase_skill`; BUY is generated server-side from a validated skill card.
+The flagship can suggest semantic UI, but the server sanitizes it before rendering.
 
-### Server-generated UI
+### 2. Server-generated UI layer
 
-orb-api can already return:
+`orb-api` also creates UI independently of the model.
+
+Current server UI structures include:
 - `buttons`
 - `skill_cards`
 - `modes`
@@ -43,7 +43,7 @@ orb-api can already return:
 - `list`
 - state data.
 
-Server actions already include:
+Server actions currently include:
 - `get_list_state`
 - `purchase_list_slots`
 - `get_mode_state`
@@ -54,99 +54,184 @@ Server actions already include:
 - `enter_ynychat`
 - `exit_ynychat`.
 
-### Telegram adapter
+`purchase_skill` is intentionally server-generated from a validated skill card; the model cannot invent a BUY action, price or dependency bundle.
 
-Telegram currently knows a different subset:
+### 3. Telegram rendering/action layer
+
+The current Telegram adapter explicitly understands a broader visible action vocabulary:
 - `open_cabinet`
 - legacy `connect_ynychat`
 - `enter_ynychat`
 - `exit_ynychat`
 - `create_profile`
-- Orb Web continuation button.
+- Orb Web continuation / handoff.
 
-This mismatch is architectural debt: an Orb action can exist in the core but not have a Telegram renderer, or vice versa.
+Therefore the **observable Telegram language is broader than the current orb-api model whitelist**.
 
-### Profile creation today
+This is important: when auditing what Orb can visibly say with buttons, we must inspect the complete channel path, not only `sanitizeOrbUi`.
 
-Telegram phrase `создай профиль` is intercepted before flagship cognition and directly executes profile creation. `create_profile` also exists as a Telegram callback concept, but is not part of the current orb-api model UI whitelist.
+### 4. Dynamic label / localization layer
 
-Target: profile creation becomes one canonical Orb action rather than a Telegram special case.
+Current Telegram behavior already separates action semantics from some visible wording.
 
-## Canonical language layers
+The adapter uses an incoming `btn.label` when one is supplied and falls back to a default label when it is absent.
+
+Profile creation flow also calls GPT-based `translateText(...)` for user-facing phrases including the button meaning `Open profile`. Because this is model-generated translation rather than a fixed locale dictionary, visible wording may vary from one execution/language/context to another.
+
+So a live button effectively already has two layers:
+
+```text
+STABLE ACTION
+create_profile / open_cabinet / enter_ynychat / ...
+
++
+
+DYNAMIC SURFACE LABEL
+"Создать профиль"
+"Открыть профиль"
+"Перейти в кабинет"
+... wording/localization may vary
+```
+
+This variability should not be treated as an error by default. It can become a deliberate feature of the Dynamic Interface Language: **stable semantic action + context-sensitive natural-language surface**.
+
+For actions where exact legal/economic wording matters, the server may force a canonical label.
+
+## Profile creation today
+
+A production Telegram-specific profile mechanism definitely exists.
+
+Current direct phrase path:
+
+```text
+Telegram message contains “создай профиль”
+→ telegram-webhook intercepts before flagship Orb
+→ checks profile_links
+→ if profile exists: reads profile
+→ otherwise creates next profile number
+→ inserts profiles row
+→ inserts Telegram profile_link
+→ sends result
+→ renders Open profile/cabinet button
+```
+
+The Telegram adapter also contains a `create_profile` callback renderer/handler vocabulary, so `CREATE PROFILE` is already part of the channel's practical interface language even though it is not currently part of the `orb-api` model whitelist.
+
+A separate legacy `orb-create-profile` Edge Function duplicates much of the creation logic.
+
+Target architecture is not to remove this working behavior, but to **lift it into one canonical action**:
+
+```text
+Actor intent
+→ ACTION / PROFILE_CREATE
+→ trusted identity validation
+→ canonical executor
+→ profile + source link
+→ STATE_DELTA: no_profile → profile_exists
+→ RESULT + PROFILE_CARD + OPEN_CABINET
+```
+
+Telegram, Web and Unity then render the same action differently.
+
+## Canonical Dynamic Interface Language
 
 ### A. Content blocks
 
-- `TEXT` — prose / explanation.
-- `QUOTE` — cited or highlighted text.
-- `MEDIA` — image, video, audio or preview.
-- `ARTIFACT` — a created book, file, page, site, token, NFT, world, etc.
-- `KNOWLEDGE_BLOCK` — reusable Infoteka/knowledge fragment.
+- `TEXT`
+- `QUOTE`
+- `MEDIA`
+- `ARTIFACT`
+- `KNOWLEDGE_BLOCK`
 
 ### B. Navigation / structure blocks
 
-- `BUTTON` — one concrete interaction.
-- `BUTTON_ROW` — grouped immediate choices.
-- `MENU` — navigation collection.
-- `LIST` — ordered/unordered collection or Neo LIST slots.
-- `CARD` — generic object summary.
-- `ENTITY_CARD` — Neo World entity/passport summary.
-- `PROFILE_CARD` — Actor/profile state.
-- `AVATAR_CARD` — identity projection / avatar state.
-- `SKILL_CARD` — capability/module state.
-- `MODE_CARD` — SYSTEM / YNY CHAT / CORP or other environment mode.
-- `PAGE` — full navigable surface.
-- `MODAL` — temporary/embedded surface.
-- `TREE` — hierarchy/branching view.
-- `WAY` — path/roadmap view.
-- `MAP` — geographic/spatial view.
-- `WORLD` — 3D/VR/metaverse/world entry surface.
+- `BUTTON`
+- `BUTTON_ROW`
+- `MENU`
+- `LIST`
+- `CARD`
+- `ENTITY_CARD`
+- `PROFILE_CARD`
+- `AVATAR_CARD`
+- `SKILL_CARD`
+- `MODE_CARD`
+- `PAGE`
+- `MODAL`
+- `TREE`
+- `WAY`
+- `MAP`
+- `WORLD`
 
 ### C. Process / state blocks
 
-- `CHECK` — one verifiable condition/result.
-- `CHECKLIST` — current Gestalt/session checks.
-- `SESSION` — semantic process state.
-- `STATE_DELTA` — verified change from state A to B.
-- `STATUS` — current state of an entity/action/process.
-- `PROGRESS` — progress projection over checks/state deltas.
-- `RESULT` — result produced by an action/session.
+- `CHECK`
+- `CHECKLIST`
+- `SESSION`
+- `STATE_DELTA`
+- `STATUS`
+- `PROGRESS`
+- `RESULT`
 
 ### D. Action / economy blocks
 
-- `ACTION` — validated executable intent.
-- `POTENTIAL_ACTION` — possible future action, not yet executable/selected.
-- `OFFER` — commercial/activation proposition; only after offer gate.
-- `ACCEPT` — Actor confirmation/acceptance.
-- `TRANSACTION` — payment/transfer result/state.
-- `ACTIVATION` — capability activation state.
-- `CONNECT` — connection of an approved external account/service.
-- `HANDOFF` — seamless move to another mode/surface while preserving context.
+- `ACTION`
+- `POTENTIAL_ACTION`
+- `OFFER`
+- `ACCEPT`
+- `TRANSACTION`
+- `ACTIVATION`
+- `CONNECT`
+- `HANDOFF`
+
+## Button passport
+
+A canonical button/action should eventually carry semantic data independently from its visual phrase.
+
+Conceptually:
+
+```json
+{
+  "type": "button",
+  "action": "PROFILE_CREATE",
+  "target": null,
+  "label_policy": "dynamic",
+  "label_intent": "create profile",
+  "fallback_label": "Создать профиль",
+  "requires_confirmation": false
+}
+```
+
+Possible `label_policy` values:
+- `dynamic` — Orb/translator can phrase naturally;
+- `localized_canonical` — deterministic locale dictionary;
+- `server_canonical` — exact server-owned wording for payments, acceptance, irreversible actions or compliance-sensitive states.
+
+This preserves the lively behavior the Telegram Orb already demonstrates without allowing wording freedom to change action semantics.
 
 ## Semantic UI AST principle
 
-The flagship should express meaning, not rendering implementation.
-
-Conceptual example:
+The flagship expresses meaning, not rendering implementation.
 
 ```json
 {
   "blocks": [
     {
       "type": "text",
-      "content": "Ты уже определил роль. Следующий участок — публичное проявление."
+      "content": "Ты можешь создать профиль и продолжить уже как Актор Neo World."
     },
     {
-      "type": "potential_action",
-      "capability_key": "SMM_AUTOPILOT",
-      "reason": "может закрыть distribution gap"
+      "type": "action",
+      "action": "PROFILE_CREATE",
+      "label_policy": "dynamic",
+      "label_intent": "create my Neo World profile"
     }
   ]
 }
 ```
 
-This DOES NOT mean a purchase card is shown. Policy decides whether a potential action remains a sentence, becomes an info card, or becomes an offer.
+The validator decides whether the action is allowed. Telegram may render an inline button, Web a card, Unity a spatial control.
 
-## Progressive disclosure as rendering law
+## Progressive disclosure
 
 ```text
 HORIZON
@@ -155,24 +240,25 @@ HORIZON
 → OFFER IF EXPLICIT INTEREST
 ```
 
-Therefore the same capability may render differently:
-
-1. distant horizon — mentioned in text only;
-2. relevant potential — translucent/potential card or link;
-3. explicit interest — detailed capability card;
-4. activation requested — offer + price + ACCEPT;
-5. activated — active capability/action controls.
+The same capability may therefore be represented as:
+1. text-only horizon;
+2. potential card;
+3. detailed capability card;
+4. offer + ACCEPT after explicit interest;
+5. active action controls after activation.
 
 ## Model vs server responsibilities
 
-### Flagship Orb may propose
-- which semantic block is useful;
-- which entity/capability/action is relevant;
-- why it belongs in the current answer;
-- desired handoff or action intent.
+### Flagship Orb may choose
+- useful semantic block;
+- relevant entity/capability/action;
+- natural visible wording when label policy permits;
+- desired handoff/action intent;
+- how the UI continues the discourse.
 
-### Server must own truth
-- prices;
+### Server owns truth
+- action identity;
+- price;
 - ownership;
 - balance;
 - dependencies;
@@ -180,64 +266,34 @@ Therefore the same capability may render differently:
 - mode availability;
 - connector state;
 - action validity;
+- irreversible state changes;
 - transaction execution;
-- irreversible state changes.
-
-The model must never invent these values.
-
-## Canonical profile-creation expression
-
-Target:
-
-```text
-Actor: “создай профиль”
-↓
-Orb intent: ACTION / PROFILE_CREATE
-↓
-server validates trusted identity context
-↓
-executor creates profile and source link
-↓
-STATE_DELTA
-  before: profile = absent
-  after:  profile = exists
-↓
-response blocks:
-  RESULT
-  PROFILE_CARD
-  BUTTON: OPEN_CABINET
-```
-
-Telegram may render this as an inline button, Web as a card, Unity as a spatial panel. It remains the same Orb sentence.
+- canonical wording where exact wording is required.
 
 ## Channel adapters
 
-The canonical language is channel-independent.
-
 ### Telegram
-Compact text + inline buttons/cards; long-response handoff to Orb Web.
+Compact text + inline actions/cards; dynamic labels are already partially used; long-response handoff to Orb Web exists.
 
 ### Web
 Rich cards, panels, modals, pages, lists, maps, media and live state.
 
 ### Unity / 3D
-The same entity/action blocks can become physical panels, objects, portals, paths, avatars and world interactions.
+The same semantic blocks can become panels, objects, portals, paths, avatars and world interactions.
 
 ### VR / Metaverse
-Cards/actions may be rendered as world objects, portals, interactive surfaces and embodied navigation.
+Actions may become world objects, portals, interactive surfaces and embodied navigation.
 
 ## Relationship with NEO-ENTITY-REGISTRY
 
-The interface registry defines canonical entities/forms such as PROFILE, AVATAR, MODAL, GAME, SPACE, 3D, VR and MV.
+The entity registry defines canonical objects such as PROFILE, AVATAR, MODAL, GAME, SPACE, 3D, VR and MV.
 
-Dynamic Interface Language is how Orb can **speak those entities into the current interaction**.
+Dynamic Interface Language defines how Orb can **speak those objects into the current interaction**.
 
-The entity registry answers: “what kinds of interface/world objects exist?”
-
-Dynamic Interface answers: “which of those objects should Orb express right now, in what state, and with which validated action?”
+> Entity Registry: what kinds of things exist.
+>
+> Dynamic Interface Language: how Orb expresses, opens, offers, changes and acts on them now.
 
 ## Core design rule
 
-> One semantic language, many renderers.
-
-Orb should never have a separate mental UI vocabulary for Telegram, Web and Unity. The adapters translate one canonical response language into each environment.
+> One semantic language, many renderers; stable actions, potentially living wording.
