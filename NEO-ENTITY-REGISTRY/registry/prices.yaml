@@ -13,7 +13,7 @@ offers:
 - {entity: neo.corp.content_factoriya, via: neo.action.corp, price: 3}
 - {entity: neo.corp.smm_avtopylot, via: neo.action.corp, price: 3}
 - {entity: neo.corp.ofis, via: neo.action.corp, price: 3}
-- {entity: neo.profile.acaunt, price: 1}
+- {entity: neo.profile.acaunt, price: 1, repeatable: true}
 - {entity: neo.profile.avatar, price: 1}
 - {entity: neo.profile.modal, price: 1}
 - {entity: neo.list.window, price: 1, free_quantity: 3, max_quantity: 100}
