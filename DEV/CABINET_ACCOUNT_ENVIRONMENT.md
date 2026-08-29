@@ -1,19 +1,20 @@
 # Cabinet Account DEV Environment
 
-This branch is an isolated development environment for the PROFILE → ACCOUNT vertical slice.
+The accessible GitHub repositories/branches are development and test space only. They are not the source of the live production Cabinet deployment.
 
 ## Isolation rules
 
-- Do not deploy this branch to the production Cabinet site.
-- Production frontend (`cabinet.yny.land`) must remain unchanged until DEV acceptance.
-- Account data must use the separate Supabase project `YNY DEV` only.
-- Test purchases use test YNY balances in DEV and must not write to production balances or transaction tables.
-- Any Cloudflare deployment must use a separate DEV Pages/Worker project and/or DEV subdomain; never the production Cabinet project.
-- Promotion to production happens only after explicit review and approval.
+- GitHub work is DEV/test by default.
+- Supabase Account data must use the separate project `YNY DEV` only.
+- Test purchases use test YNY balances in DEV and must not write to production balances or production transaction data.
+- Any Cloudflare deployment for this work must use a separate DEV Pages/Worker project and/or DEV hostname.
+- The live production Cabinet is a separate published environment and must not be modified until explicit acceptance.
 
-## Current DEV branch
+## Current feature branch
 
 `cabinet-account-dev`
+
+This extra branch is only for feature isolation/convenience inside the already-test GitHub environment; it is not a production boundary.
 
 ## Current scope
 
